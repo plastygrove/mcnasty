@@ -89,6 +89,7 @@ void MainWindow::FileOpen()
     }
     else
     {
+        if(isDebug) qDebug(fileName.toLocal8Bit().data());
         QFile file(fileName);
         if(!file.open(QIODevice::ReadOnly|QIODevice::Text))
         {
@@ -97,7 +98,7 @@ void MainWindow::FileOpen()
         }
 
         QFileInfo qf(file);
-        projectDir = qf.absoluteFilePath();
+        projectDir = qf.absolutePath();
 
 
 
@@ -147,8 +148,17 @@ void MainWindow::DoCompile()
 void MainWindow::Run()
 {
     if(isDebug) qDebug("Doing Run");
+    if(projectDir.isEmpty() || fileName.isEmpty())
+    {
+        this->outputBox->appendPlainText("File not opened, please open the file and compile it");
+        return;
+    }
     QObject *parent = this;
-    QString program = projectDir+"/"+fileName.remove(".asm");
+    QString program = fileName;
+    program.remove(".asm");
+    //if(isDebug) qDebug(projectDir.toLocal8Bit().data());
+    if(isDebug) qDebug(fileName.toLocal8Bit().data());
+    //if(isDebug) qDebug(fileName.remove(".asm").toLocal8Bit().data());
     if(isDebug) qDebug(program.toLocal8Bit().data());
     QProcess *myProcess = new QProcess(parent);
     myProcess->start(program);
